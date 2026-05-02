@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Site Visit - Kenya Plots</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Book Your Free Site Visit</h1>
+    <form id="leadForm">
+      <input type="text" id="name" placeholder="Your Full Name" required>
+      <input type="tel" id="phone" placeholder="Phone: 07XX XXX" required>
+      
+      <select id="plot" required>
+        <option value="">Select Plot</option>
+        <option value="Plot A - Thika Road 50x100">Plot A - Thika Road 50x100 - KES 1.5M</option>
+        <option value="Plot B - Nakuru 40x80">Plot B - Nakuru 40x80 - KES 800K</option>
+        <option value="Plot C - Naivasha 1 Acre">Plot C - Naivasha 1 Acre - KES 2M</option>
+      </select>
+
+      <select id="payment" required>
+        <option value="">Payment Method</option>
+        <option value="Cash">Cash</option>
+        <option value="Installments">Installments</option>
+      </select>
+
+      <input type="date" id="date" required min="2026-05-02">
+      
+      <button type="submit">Book Site Visit</button>
+    </form>
+    <div id="message"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+  </html>
