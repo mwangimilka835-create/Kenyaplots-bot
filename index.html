@@ -3,35 +3,317 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Site Visit - Kenya Plots</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Kenya Plots Agent</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f5f5f5;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .chat-container { 
+      max-width: 500px; 
+      margin: 0 auto; 
+      background: #fff; 
+      height: 100vh; 
+      display: flex; 
+      flex-direction: column;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    .header { 
+      background: #0f6c3e; 
+      color: #fff; 
+      padding: 12px 16px; 
+      display: flex; 
+      align-items: center; 
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .header .avatar { 
+      width: 40px; 
+      height: 40px; 
+      background: #fff; 
+      color: #0f6c3e; 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .header h3 { 
+      margin: 0; 
+      font-size: 16px; 
+      font-weight: 600;
+    }
+    .header .status { 
+      font-size: 12px; 
+      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .header .status::before {
+      content: "●";
+      color: #4caf50;
+      font-size: 10px;
+    }
+    .chat-body { 
+      flex: 1; 
+      padding: 16px; 
+      overflow-y: auto; 
+      background: #ece5dd;
+    }
+    .msg { 
+      margin-bottom: 12px; 
+      display: flex;
+    }
+    .msg-bot { 
+      justify-content: flex-start;
+    }
+    .msg-user { 
+      justify-content: flex-end;
+    }
+    .msg-bot .bubble { 
+      background: #fff; 
+      padding: 10px 14px; 
+      border-radius: 18px; 
+      border-top-left-radius: 4px;
+      max-width: 85%;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .msg-user .bubble { 
+      background: #dcf8c6; 
+      padding: 10px 14px; 
+      border-radius: 18px; 
+      border-top-right-radius: 4px;
+      max-width: 85%;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+      font-size: 14px;
+    }
+    .card { 
+      background: #fff; 
+      border-radius: 12px; 
+      overflow: hidden; 
+      margin: 12px 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .card img { 
+      width: 100%; 
+      height: 180px; 
+      object-fit: cover; 
+    }
+    .card-body { 
+      padding: 12px; 
+    }
+    .badge { 
+      background: #e8f5e9; 
+      color: #0f6c3e;
+      padding: 4px 10px; 
+      border-radius: 12px; 
+      font-size: 12px; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .price { 
+      color: #0f6c3e; 
+      font-weight: 700; 
+      font-size: 20px; 
+      margin: 8px 0;
+    }
+    .card-text {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.4;
+    }
+    .view-map {
+      width: 100%;
+      padding: 8px;
+      background: #f5f5f5;
+      border: none;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 14px;
+      color: #0f6c3e;
+    }
+    .input-area { 
+      padding: 12px; 
+      border-top: 1px solid #e0e0e0; 
+      background: #f0f0f0;
+      display: flex;
+      gap: 8px;
+    }
+    .input-area input { 
+      flex: 1;
+      padding: 12px 16px; 
+      border: none; 
+      border-radius: 24px; 
+      font-size: 14px;
+      outline: none;
+    }
+    .input-area button { 
+      padding: 12px 20px; 
+      background: #0f6c3e; 
+      color: #fff; 
+      border: none; 
+      border-radius: 24px; 
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .input-area button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .footer {
+      text-align: center;
+      padding: 8px;
+      font-size: 12px;
+      color: #666;
+      background: #f0f0f0;
+    }
+    .checkmark {
+      color: #4caf50;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Book Your Free Site Visit</h1>
-    <form id="leadForm">
-      <input type="text" id="name" placeholder="Your Full Name" required>
-      <input type="tel" id="phone" placeholder="Phone: 07XX XXX" required>
-      
-      <select id="plot" required>
-        <option value="">Select Plot</option>
-        <option value="Plot A - Thika Road 50x100">Plot A - Thika Road 50x100 - KES 1.5M</option>
-        <option value="Plot B - Nakuru 40x80">Plot B - Nakuru 40x80 - KES 800K</option>
-        <option value="Plot C - Naivasha 1 Acre">Plot C - Naivasha 1 Acre - KES 2M</option>
-      </select>
-
-      <select id="payment" required>
-        <option value="">Payment Method</option>
-        <option value="Cash">Cash</option>
-        <option value="Installments">Installments</option>
-      </select>
-
-      <input type="date" id="date" required min="2026-05-02">
-      
-      <button type="submit">Book Site Visit</button>
-    </form>
-    <div id="message"></div>
+  <div class="chat-container">
+    <div class="header">
+      <div class="avatar">KP</div>
+      <div>
+        <h3>Kenya Plots Agent</h3>
+        <div class="status">Online & ready to help</div>
+      </div>
+    </div>
+    
+    <div class="chat-body" id="chatBody">
+      <div class="msg msg-bot">
+        <div class="bubble">
+          <span class="badge">✓ Verified properties. Secure booking. No hidden fees.</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off">
+      <button id="sendBtn" onclick="sendMessage()">Send</button>
+    </div>
+    
+    <div class="footer">
+      Conversation completed. We'll be in touch soon!
+    </div>
   </div>
-  <script src="script.js"></script>
+
+  <script>
+    let step = 0;
+    let bookingData = {};
+    const chatBody = document.getElementById('chatBody');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // Start conversation
+    window.onload = () => {
+      setTimeout(() => {
+        addBotMessage(`
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" alt="Sunrise Gardens">
+            <div class="card-body">
+              <div class="badge">📍 Sunrise Gardens - Thika Road</div>
+              <div class="price">KES 1,200,000</div>
+              <div class="card-text">Prime 1/8 acre plot along Thika Superhighway. Ready title deed, electricity & water available. Only 30 min from Nairobi CBD.</div>
+              <button class="view-map">View on Map</button>
+            </div>
+          </div>
+        `);
+        setTimeout(() => {
+          addBotMessage('How would you like to pay?<br><br>Reply <strong>1</strong> for Cash<br>Reply <strong>2</strong> for Installments');
+          step = 1;
+        }, 800);
+      }, 500);
+    };
+
+    function sendMessage() {
+      const msg = userInput.value.trim();
+      if (!msg) return;
+      
+      addUserMessage(msg);
+      userInput.value = '';
+      sendBtn.disabled = true;
+      
+      setTimeout(() => {
+        handleStep(msg);
+        sendBtn.disabled = false;
+      }, 600);
+    }
+
+    function addUserMessage(msg) {
+      chatBody.innerHTML += `<div class="msg msg-user"><div class="bubble">${msg}</div></div>`;
+      scrollToBottom();
+    }
+
+    function addBotMessage(msg) {
+      chatBody.innerHTML += `<div class="msg msg-bot"><div class="bubble">${msg}</div></div>`;
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function handleStep(msg) {
+      if (step === 1) {
+        if (msg === '1') {
+          bookingData.payment = 'Cash';
+          addBotMessage('<span class="checkmark">✓</span> Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.<br><br>📅 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
+          step = 2;
+        } else if (msg === '2') {
+          bookingData.payment = 'Installments';
+          addBotMessage('📅 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
+          step = 2;
+        } else {
+          addBotMessage('Please reply with <strong>1</strong> for Cash or <strong>2</strong> for Installments.');
+        }
+      } else if (step === 2) {
+        bookingData.date = msg;
+        addBotMessage(`🎉 <strong>Booking Confirmed!</strong><br><br>Your site visit is scheduled for <strong>${msg}</strong>.<br><br>Our agent will contact you to confirm the details.<br><br>Thank you for your interest! 🏡`);
+        saveToDatabase();
+        step = 3;
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        userInput.placeholder = 'Conversation completed';
+      }
+    }
+
+    async function saveToDatabase() {
+      try {
+        await fetch('/api/leads', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            name: 'Chat User',
+            phone: 'From chat',
+            plot: 'Sunrise Gardens - Thika Road',
+            payment: bookingData.payment,
+            visit_date: bookingData.date,
+            created_at: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.error('Save error:', err);
+      }
+    }
+
+    // Enter key to send
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
 </body>
   </html>
