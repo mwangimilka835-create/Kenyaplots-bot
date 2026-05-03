@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kenya Plots Agent</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f5f5f5;">
   <div style="max-width:500px;margin:0 auto;background:#fff;height:100vh;height:100dvh;display:flex;flex-direction:column;box-shadow:0 0 20px rgba(0,0,0,0.1);">
@@ -14,7 +15,7 @@
         <h3 style="margin:0;font-size:16px;font-weight:600;">Kenya Plots Agent</h3>
         <div style="font-size:12px;opacity:0.9;display:flex;align-items:center;gap:4px;">● Online & ready to help</div>
       </div>
-      <div style="font-size:12px;opacity:0.8;">Admin</div>
+      <button onclick="toggleLanguage()" style="background:#fff;color:#0f6c3e;border:none;padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer;">Swahili</button>
     </div>
     
     <!-- Chat Body -->
@@ -42,11 +43,68 @@
   <script>
     let step = 0;
     let bookingData = {};
+    let leadScore = 0;
+    let language = 'en'; // 'en' or 'sw'
     const chatBody = document.getElementById('chatBody');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    window.onload = () => {
+    const translations = {
+      en: {
+        pay: 'How would you like to pay?',
+        cash: 'Reply <strong>1</strong> for Cash',
+        installments: 'Reply <strong>2</strong> for Installments',
+        phone: '📱 What\'s your phone number? <small>(e.g. 0712345678)</small>',
+        date: '📅 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)',
+        invalidPhone: 'That doesn\'t look like a valid Kenyan phone number.<br><br>Please enter like <strong>0712345678</strong> or <strong>+254712345678</strong>',
+        invalidDate: 'Please enter a valid date like <strong>15 July 2025</strong> or <strong>23/12/2025</strong>.<br><br>Don\'t just type letters like "gdd".',
+        confirmed: '🎉 <strong>Booking Confirmed!</strong><br><br>Your site visit is scheduled for <strong>{date}</strong>.<br><br>Our agent will contact you at <strong>{phone}</strong> to confirm the details.<br><br>Lead Score: {score} points<br><br>Thank you for your interest! 🏡',
+        gatePass: '🎫 <strong>Your Gate Pass is ready!</strong><br><br>Show this QR code at the gate on <strong>{date}</strong>. Valid for 2 hours only.<br><br><canvas id="qrcode"></canvas>',
+        hotLead: '<span style="color:#d32f2f;">🔥 Hot Lead Alert!</span> Our sales agent will call you within 5 minutes.',
+        map: '🗺️ Opening map view...<br><br><a href="https://maps.google.com" target="_blank" style="color:#0f6c3e;">Click here to view on Google Maps</a>',
+        video: '🎥 Here\'s a 30-sec video walkthrough of Sunrise Gardens:<br><br><video width="100%" controls style="border-radius:8px;margin-top:8px;"><source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4"></video>',
+        school: '🏫 The nearest primary school is 1.2km away (5 min drive). Secondary school is 3.5km away.',
+        internet: '📡 Yes, Safaricom Fiber is available in Sunrise Gardens. Safaricom 4G and Airtel 4G also have full coverage.',
+        titleDeed: '📄 Here\'s a specimen copy of the Title Deed for Sunrise Gardens:<br><br><img src="https://via.placeholder.com/400x250/cccccc/666?text=Specimen+Title+Deed" style="width:100%;border-radius:8px;margin-top:8px;filter:blur(2px);"><br><small>Blurred for security. Full original available during site visit.</small>',
+        langBtn: 'Swahili'
+      },
+      sw: {
+        pay: 'Ungependa kulipia vipi?',
+        cash: 'Jibu <strong>1</strong> kwa Pesa Taslimu',
+        installments: 'Jibu <strong>2</strong> kwa Malipo ya Awamu',
+        phone: '📱 Nambari yako ya simu ni ipi? <small>(mf. 0712345678)</small>',
+        date: '📅 Ungependa kutembelea eneo lini?<br><br>Tafadhali jibu na tarehe unayopendelea (mf. 15 Julai 2025)',
+        invalidPhone: 'Hiyo haionekani kama nambari sahihi ya Kenya.<br><br>Tafadhali weka kama <strong>0712345678</strong> au <strong>+254712345678</strong>',
+        invalidDate: 'Tafadhali weka tarehe sahihi kama <strong>15 Julai 2025</strong> au <strong>23/12/2025</strong>.<br><br>Usitumie herufi tu kama "gdd".',
+        confirmed: '🎉 <strong>Uhifadhi Umethibitishwa!</strong><br><br>Ziara yako ya eneo imepangwa kwa <strong>{date}</strong>.<br><br>Wakala wetu atawasiliana nawe kwa <strong>{phone}</strong> kuthibitisha maelezo.<br><br>Alama ya Uongozi: {score} alama<br><br>Asante kwa hamu yako! 🏡',
+        gatePass: '🎫 <strong>Pass yako ya Kuingia iko tayari!</strong><br><br>Onyesha QR code hii kwenye gate tarehe <strong>{date}</strong>. Inatumika kwa masaa 2 tu.<br><br><canvas id="qrcode"></canvas>',
+        hotLead: '<span style="color:#d32f2f;">🔥 Uongozi Moto!</span> Wakala wetu wa mauzo atakuita ndani ya dakika 5.',
+        map: '🗺️ Kufungua ramani...<br><br><a href="https://maps.google.com" target="_blank" style="color:#0f6c3e;">Bonyeza hapa kuona kwenye Google Maps</a>',
+        video: '🎥 Hii ni video ya sekunde 30 ya kutembea Sunrise Gardens:<br><br><video width="100%" controls style="border-radius:8px;margin-top:8px;"><source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4"></video>',
+        school: '🏫 Shule ya msingi iliyo karibu ni km 1.2 (dakika 5 kwa gari). Shule ya upili ni km 3.5.',
+        internet: '📡 Ndio, Safaricom Fiber inapatikana Sunrise Gardens. Safaricom 4G na Airtel 4G pia zina mtandao mzuri.',
+        titleDeed: '📄 Hii ni nakala ya mfano ya Hati ya Ardhi ya Sunrise Gardens:<br><br><img src="https://via.placeholder.com/400x250/cccccc/666?text=Specimen+Title+Deed" style="width:100%;border-radius:8px;margin-top:8px;filter:blur(2px);"><br><small>Imefichwa kwa usalama. Asili inapatikana wakati wa ziara.',
+        langBtn: 'English'
+      }
+    };
+
+    function t(key, vars = {}) {
+      let text = translations[language][key];
+      for (let k in vars) {
+        text = text.replace(`{${k}}`, vars[k]);
+      }
+      return text;
+    }
+
+    function toggleLanguage() {
+      language = language === 'en'? 'sw' : 'en';
+      document.querySelector('button[onclick="toggleLanguage()"]').textContent = translations[language].langBtn;
+      userInput.placeholder = language === 'en'? 'Type your message...' : 'Andika ujumbe wako...';
+      // Restart conversation in new language
+      step = 0;
+      bookingData = {};
+      leadScore = 0;
+      chatBody.innerHTML = `<div style="margin-bottom:12px;display:flex;gap:8px;justify-content:flex-start;"><div style="width:28px;height:28px;background:#0f6c3e;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">KP</div><div style="background:#fff;padding:10px 14px;border-radius:18px;border-top-left-radius:4px;max-width:85%;box-shadow:0 1px 1px rgba(0,0,0,0.1);font-size:14px;line-height:1.4;"><span style="background:#e8f5e9;color:#0f6c3e;padding:4px 10px;border-radius:12px;font-size:12px;display:inline-flex;align-items:center;gap:4px;margin-bottom:8px;">✓ Verified properties. Secure booking. No hidden fees.</span></div></div>`;
       setTimeout(() => {
         addBotMessage(`
           <div style="background:#fff;border-radius:12px;overflow:hidden;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,0.12);">
@@ -55,15 +113,20 @@
               <div style="background:#e8f5e9;color:#0f6c3e;padding:4px 10px;border-radius:12px;font-size:12px;display:inline-flex;align-items:center;gap:4px;margin-bottom:8px;">📍 Sunrise Gardens - Thika Road</div>
               <div style="color:#0f6c3e;font-weight:700;font-size:20px;margin:8px 0;">KES 1,200,000</div>
               <div style="font-size:14px;color:#333;line-height:1.4;">Prime 1/8 acre plot along Thika Superhighway. Ready title deed, electricity & water available. Only 30 min from Nairobi CBD.</div>
-              <button style="width:100%;padding:8px;background:#f5f5f5;border:none;border-radius:8px;margin-top:8px;font-size:14px;color:#0f6c3e;">View on Map</button>
+              <button onclick="viewMap()" style="width:100%;padding:8px;background:#f5f5f5;border:none;border-radius:8px;margin-top:8px;font-size:14px;color:#0f6c3e;cursor:pointer;">View on Map</button>
+              <button onclick="watchVideo()" style="width:100%;padding:8px;background:#0f6c3e;color:#fff;border:none;border-radius:8px;margin-top:8px;font-size:14px;cursor:pointer;">▶ Watch Video Tour</button>
             </div>
           </div>
         `);
         setTimeout(() => {
-          addBotMessage('How would you like to pay?<br><br>Reply <strong>1</strong> for Cash<br>Reply <strong>2</strong> for Installments');
+          addBotMessage(t('pay') + '<br><br>' + t('cash') + '<br>' + t('installments'));
           step = 1;
         }, 800);
       }, 500);
+    }
+
+    window.onload = () => {
+      toggleLanguage(); // Start in English
     };
 
     function sendMessage() {
@@ -94,6 +157,29 @@
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
+    function viewMap() {
+      leadScore += 5;
+      checkHotLead();
+      addBotMessage(t('map'));
+    }
+
+    function watchVideo() {
+      leadScore += 10;
+      checkHotLead();
+      addBotMessage(t('video'));
+    }
+
+    function generateQRCode(data) {
+      setTimeout(() => {
+        const canvas = document.getElementById('qrcode');
+        if (canvas) {
+          QRCode.toCanvas(canvas, data, { width: 200 }, function (error) {
+            if (error) console.error(error);
+          });
+        }
+      }, 100);
+    }
+
     function isValidPhone(phone) {
       return /^(\+254|0)[17]\d{8}$/.test(phone.replace(/\s/g, ''));
     }
@@ -105,41 +191,85 @@
       return date.length >= 5 && (hasLetters && hasNumbers || looksLikeDate);
     }
 
+    function checkHotLead() {
+      if (leadScore >= 25) {
+        console.log('🔥 HOT LEAD DETECTED! Score:', leadScore);
+        addBotMessage(t('hotLead'));
+        // In production: send webhook/SMS to sales agent
+        // fetch('https://your-backend.com/notify-hot-lead', { method: 'POST', body: JSON.stringify(bookingData) });
+      }
+    }
+
     function handleStep(msg) {
-      console.log('Current step:', step, 'Message:', msg); // For debugging
+      const msgLower = msg.toLowerCase();
       
+      // Neighborhood Context RAG
+      if (msgLower.includes('school') || msgLower.includes('shule') || msgLower.includes('internet') || msgLower.includes('fiber') || msgLower.includes('hospital') || msgLower.includes('market')) {
+        if (msgLower.includes('school') || msgLower.includes('shule')) {
+          addBotMessage(t('school'));
+        } else if (msgLower.includes('internet') || msgLower.includes('fiber')) {
+          addBotMessage(t('internet'));
+        }
+        return;
+      }
+      
+      // Document Preview
+      if (msgLower.includes('proof') || msgLower.includes('title deed') || msgLower.includes('ownership') || msgLower.includes('document') || msgLower.includes('hati')) {
+        addBotMessage(t('titleDeed'));
+        leadScore += 15;
+        checkHotLead();
+        return;
+      }
+
+      // Main booking flow
       if (step === 1) {
         if (msg === '1') {
-          bookingData.payment = 'Cash';
-          addBotMessage('<span style="color:#4caf50;font-weight:bold;">✓</span> Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.<br><br>📱 What\'s your phone number? <small>(e.g. 0712345678)</small>');
-          step = 2; // Go to phone step
+          bookingData.payment = language === 'en'? 'Cash' : 'Pesa Taslimu';
+          leadScore += 20;
+          checkHotLead();
+          addBotMessage('<span style="color:#4caf50;font-weight:bold;">✓</span> ' + (language === 'en'? 'Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.' : 'Chaguo zuri! Wanunuzi wa pesa taslimu wanapata <strong>punguzo la 5%</strong> kwenye bei iliyoorodheshwa.') + '<br><br>' + t('phone'));
+          step = 2;
         } else if (msg === '2') {
-          bookingData.payment = 'Installments';
-          addBotMessage('📱 What\'s your phone number? <small>(e.g. 0712345678)</small>');
-          step = 2; // Go to phone step
+          bookingData.payment = language === 'en'? 'Installments' : 'Malipo ya Awamu';
+          addBotMessage(t('phone'));
+          step = 2;
         } else {
-          addBotMessage('Please reply with <strong>1</strong> for Cash or <strong>2</strong> for Installments.');
+          addBotMessage(t('pay') + '<br><br>' + t('cash') + '<br>' + t('installments'));
         }
       } else if (step === 2) {
         if (!isValidPhone(msg)) {
-          addBotMessage('That doesn\'t look like a valid Kenyan phone number.<br><br>Please enter like <strong>0712345678</strong> or <strong>+254712345678</strong>');
+          addBotMessage(t('invalidPhone'));
           return;
         }
         bookingData.phone = msg;
-        addBotMessage('📅 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
-        step = 3; // Go to date step
+        addBotMessage(t('date'));
+        step = 3;
       } else if (step === 3) {
         if (!isValidDate(msg)) {
-          addBotMessage('Please enter a valid date like <strong>15 July 2025</strong> or <strong>23/12/2025</strong>.<br><br>Don\'t just type letters like "gdd".');
+          addBotMessage(t('invalidDate'));
           return;
         }
         bookingData.date = msg;
-        addBotMessage(`🎉 <strong>Booking Confirmed!</strong><br><br>Your site visit is scheduled for <strong>${msg}</strong>.<br><br>Our agent will contact you at <strong>${bookingData.phone}</strong> to confirm the details.<br><br>Thank you for your interest! 🏡`);
+        addBotMessage(t('confirmed', { date: msg, phone: bookingData.phone, score: leadScore }));
+        
+        // Generate Gate Pass QR Code - IoT Site Access
+        setTimeout(() => {
+          const qrData = JSON.stringify({
+            name: 'Chat User',
+            phone: bookingData.phone,
+            plot: 'Sunrise Gardens',
+            date: bookingData.date,
+            expires: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
+          });
+          addBotMessage(t('gatePass', { date: msg }));
+          generateQRCode(qrData);
+        }, 1000);
+        
         saveToDatabase();
         step = 4;
         userInput.disabled = true;
         sendBtn.disabled = true;
-        userInput.placeholder = 'Conversation completed';
+        userInput.placeholder = language === 'en'? 'Conversation completed' : 'Mazungumzo yameisha';
       }
     }
 
@@ -154,6 +284,8 @@
             plot: 'Sunrise Gardens - Thika Road',
             payment: bookingData.payment,
             visit_date: bookingData.date,
+            lead_score: leadScore,
+            language: language,
             created_at: new Date().toISOString()
           })
         });
