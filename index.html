@@ -44,7 +44,7 @@
     let step = 0;
     let bookingData = {};
     let leadScore = 0;
-    let language = 'en'; // 'en' or 'sw'
+    let language = 'en';
     const chatBody = document.getElementById('chatBody');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
@@ -57,15 +57,11 @@
         phone: '📱 What\'s your phone number? <small>(e.g. 0712345678)</small>',
         date: '📅 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)',
         invalidPhone: 'That doesn\'t look like a valid Kenyan phone number.<br><br>Please enter like <strong>0712345678</strong> or <strong>+254712345678</strong>',
-        invalidDate: 'Please enter a valid date like <strong>15 July 2025</strong> or <strong>23/12/2025</strong>.<br><br>Don\'t just type letters like "gdd".',
+        invalidDate: 'Please enter a valid date like <strong>15 July 2025</strong> or <strong>23/12/2025</strong>.',
         confirmed: '🎉 <strong>Booking Confirmed!</strong><br><br>Your site visit is scheduled for <strong>{date}</strong>.<br><br>Our agent will contact you at <strong>{phone}</strong> to confirm the details.<br><br>Lead Score: {score} points<br><br>Thank you for your interest! 🏡',
         gatePass: '🎫 <strong>Your Gate Pass is ready!</strong><br><br>Show this QR code at the gate on <strong>{date}</strong>. Valid for 2 hours only.<br><br><canvas id="qrcode"></canvas>',
         hotLead: '<span style="color:#d32f2f;">🔥 Hot Lead Alert!</span> Our sales agent will call you within 5 minutes.',
-        map: '🗺️ Opening map view...<br><br><a href="https://maps.google.com" target="_blank" style="color:#0f6c3e;">Click here to view on Google Maps</a>',
-        video: '🎥 Here\'s a 30-sec video walkthrough of Sunrise Gardens:<br><br><video width="100%" controls style="border-radius:8px;margin-top:8px;"><source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4"></video>',
-        school: '🏫 The nearest primary school is 1.2km away (5 min drive). Secondary school is 3.5km away.',
-        internet: '📡 Yes, Safaricom Fiber is available in Sunrise Gardens. Safaricom 4G and Airtel 4G also have full coverage.',
-        titleDeed: '📄 Here\'s a specimen copy of the Title Deed for Sunrise Gardens:<br><br><img src="https://via.placeholder.com/400x250/cccccc/666?text=Specimen+Title+Deed" style="width:100%;border-radius:8px;margin-top:8px;filter:blur(2px);"><br><small>Blurred for security. Full original available during site visit.</small>',
+        invoice: '📄 <strong>eTIMS Invoice Generated!</strong><br><br>Invoice #{invoiceNo} has been sent to KRA. You can download it here:<br><a href="{invoiceUrl}" target="_blank" style="color:#0f6c3e;">Download PDF Invoice</a>',
         langBtn: 'Swahili'
       },
       sw: {
@@ -75,15 +71,11 @@
         phone: '📱 Nambari yako ya simu ni ipi? <small>(mf. 0712345678)</small>',
         date: '📅 Ungependa kutembelea eneo lini?<br><br>Tafadhali jibu na tarehe unayopendelea (mf. 15 Julai 2025)',
         invalidPhone: 'Hiyo haionekani kama nambari sahihi ya Kenya.<br><br>Tafadhali weka kama <strong>0712345678</strong> au <strong>+254712345678</strong>',
-        invalidDate: 'Tafadhali weka tarehe sahihi kama <strong>15 Julai 2025</strong> au <strong>23/12/2025</strong>.<br><br>Usitumie herufi tu kama "gdd".',
+        invalidDate: 'Tafadhali weka tarehe sahihi kama <strong>15 Julai 2025</strong> au <strong>23/12/2025</strong>.',
         confirmed: '🎉 <strong>Uhifadhi Umethibitishwa!</strong><br><br>Ziara yako ya eneo imepangwa kwa <strong>{date}</strong>.<br><br>Wakala wetu atawasiliana nawe kwa <strong>{phone}</strong> kuthibitisha maelezo.<br><br>Alama ya Uongozi: {score} alama<br><br>Asante kwa hamu yako! 🏡',
         gatePass: '🎫 <strong>Pass yako ya Kuingia iko tayari!</strong><br><br>Onyesha QR code hii kwenye gate tarehe <strong>{date}</strong>. Inatumika kwa masaa 2 tu.<br><br><canvas id="qrcode"></canvas>',
         hotLead: '<span style="color:#d32f2f;">🔥 Uongozi Moto!</span> Wakala wetu wa mauzo atakuita ndani ya dakika 5.',
-        map: '🗺️ Kufungua ramani...<br><br><a href="https://maps.google.com" target="_blank" style="color:#0f6c3e;">Bonyeza hapa kuona kwenye Google Maps</a>',
-        video: '🎥 Hii ni video ya sekunde 30 ya kutembea Sunrise Gardens:<br><br><video width="100%" controls style="border-radius:8px;margin-top:8px;"><source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4"></video>',
-        school: '🏫 Shule ya msingi iliyo karibu ni km 1.2 (dakika 5 kwa gari). Shule ya upili ni km 3.5.',
-        internet: '📡 Ndio, Safaricom Fiber inapatikana Sunrise Gardens. Safaricom 4G na Airtel 4G pia zina mtandao mzuri.',
-        titleDeed: '📄 Hii ni nakala ya mfano ya Hati ya Ardhi ya Sunrise Gardens:<br><br><img src="https://via.placeholder.com/400x250/cccccc/666?text=Specimen+Title+Deed" style="width:100%;border-radius:8px;margin-top:8px;filter:blur(2px);"><br><small>Imefichwa kwa usalama. Asili inapatikana wakati wa ziara.',
+        invoice: '📄 <strong>Ankara ya eTIMS Imetengenezwa!</strong><br><br>Ankara #{invoiceNo} imetumwa kwa KRA. Unaweza kuipakua hapa:<br><a href="{invoiceUrl}" target="_blank" style="color:#0f6c3e;">Pakua PDF Invoice</a>',
         langBtn: 'English'
       }
     };
@@ -100,7 +92,6 @@
       language = language === 'en'? 'sw' : 'en';
       document.querySelector('button[onclick="toggleLanguage()"]').textContent = translations[language].langBtn;
       userInput.placeholder = language === 'en'? 'Type your message...' : 'Andika ujumbe wako...';
-      // Restart conversation in new language
       step = 0;
       bookingData = {};
       leadScore = 0;
@@ -126,7 +117,12 @@
     }
 
     window.onload = () => {
-      toggleLanguage(); // Start in English
+      // Keep Render awake - ping every 14 minutes
+      setInterval(() => {
+        fetch('/api/ping').catch(() => {});
+      }, 14 * 60 * 1000);
+      
+      toggleLanguage();
     };
 
     function sendMessage() {
@@ -160,13 +156,13 @@
     function viewMap() {
       leadScore += 5;
       checkHotLead();
-      addBotMessage(t('map'));
+      addBotMessage('🗺️ Opening map view...<br><br><a href="https://maps.google.com" target="_blank" style="color:#0f6c3e;">Click here to view on Google Maps</a>');
     }
 
     function watchVideo() {
       leadScore += 10;
       checkHotLead();
-      addBotMessage(t('video'));
+      addBotMessage('🎥 Here\'s a 30-sec video walkthrough of Sunrise Gardens:<br><br><video width="100%" controls style="border-radius:8px;margin-top:8px;"><source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4"></video>');
     }
 
     function generateQRCode(data) {
@@ -192,11 +188,21 @@
     }
 
     function checkHotLead() {
-      if (leadScore >= 25) {
+      if (leadScore >= 30) {
         console.log('🔥 HOT LEAD DETECTED! Score:', leadScore);
         addBotMessage(t('hotLead'));
-        // In production: send webhook/SMS to sales agent
-        // fetch('https://your-backend.com/notify-hot-lead', { method: 'POST', body: JSON.stringify(bookingData) });
+        // Send WhatsApp/Email alert to agent
+        fetch('/api/notify-agent', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            phone: bookingData.phone,
+            plot: 'Sunrise Gardens',
+            payment: bookingData.payment,
+            score: leadScore,
+            date: bookingData.date
+          })
+        }).catch(() => {});
       }
     }
 
@@ -206,16 +212,16 @@
       // Neighborhood Context RAG
       if (msgLower.includes('school') || msgLower.includes('shule') || msgLower.includes('internet') || msgLower.includes('fiber') || msgLower.includes('hospital') || msgLower.includes('market')) {
         if (msgLower.includes('school') || msgLower.includes('shule')) {
-          addBotMessage(t('school'));
+          addBotMessage('🏫 The nearest primary school is 1.2km away (5 min drive). Secondary school is 3.5km away.');
         } else if (msgLower.includes('internet') || msgLower.includes('fiber')) {
-          addBotMessage(t('internet'));
+          addBotMessage('📡 Yes, Safaricom Fiber is available in Sunrise Gardens. Safaricom 4G and Airtel 4G also have full coverage.');
         }
         return;
       }
       
       // Document Preview
       if (msgLower.includes('proof') || msgLower.includes('title deed') || msgLower.includes('ownership') || msgLower.includes('document') || msgLower.includes('hati')) {
-        addBotMessage(t('titleDeed'));
+        addBotMessage('📄 Here\'s a specimen copy of the Title Deed for Sunrise Gardens:<br><br><img src="https://via.placeholder.com/400x250/cccccc/666?text=Specimen+Title+Deed" style="width:100%;border-radius:8px;margin-top:8px;filter:blur(2px);"><br><small>Blurred for security. Full original available during site visit.</small>');
         leadScore += 15;
         checkHotLead();
         return;
@@ -225,7 +231,7 @@
       if (step === 1) {
         if (msg === '1') {
           bookingData.payment = language === 'en'? 'Cash' : 'Pesa Taslimu';
-          leadScore += 20;
+          leadScore += 20; // +20 for cash
           checkHotLead();
           addBotMessage('<span style="color:#4caf50;font-weight:bold;">✓</span> ' + (language === 'en'? 'Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.' : 'Chaguo zuri! Wanunuzi wa pesa taslimu wanapata <strong>punguzo la 5%</strong> kwenye bei iliyoorodheshwa.') + '<br><br>' + t('phone'));
           step = 2;
@@ -242,6 +248,8 @@
           return;
         }
         bookingData.phone = msg;
+        leadScore += 10; // +10 for valid phone
+        checkHotLead();
         addBotMessage(t('date'));
         step = 3;
       } else if (step === 3) {
@@ -250,6 +258,9 @@
           return;
         }
         bookingData.date = msg;
+        leadScore += 15; // +15 for booking site visit
+        checkHotLead();
+        
         addBotMessage(t('confirmed', { date: msg, phone: bookingData.phone, score: leadScore }));
         
         // Generate Gate Pass QR Code - IoT Site Access
@@ -265,11 +276,40 @@
           generateQRCode(qrData);
         }, 1000);
         
+        // Generate eTIMS Invoice if cash payment
+        if (bookingData.payment === 'Cash' || bookingData.payment === 'Pesa Taslimu') {
+          setTimeout(() => {
+            generateeTIMSInvoice();
+          }, 2000);
+        }
+        
         saveToDatabase();
         step = 4;
         userInput.disabled = true;
         sendBtn.disabled = true;
         userInput.placeholder = language === 'en'? 'Conversation completed' : 'Mazungumzo yameisha';
+      }
+    }
+
+    async function generateeTIMSInvoice() {
+      try {
+        const response = await fetch('/api/generate-invoice', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            phone: bookingData.phone,
+            plot: 'Sunrise Gardens - Thika Road',
+            amount: 1200000,
+            payment: bookingData.payment,
+            date: bookingData.date
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          addBotMessage(t('invoice', { invoiceNo: data.invoiceNo, invoiceUrl: data.invoiceUrl }));
+        }
+      } catch (err) {
+        console.error('eTIMS error:', err);
       }
     }
 
