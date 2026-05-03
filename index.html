@@ -99,19 +99,24 @@
     }
 
     function isValidDate(date) {
-      return date.length >= 3 &&!/^\d+$/.test(date);
+      const hasLetters = /[a-zA-Z]/.test(date);
+      const hasNumbers = /\d/.test(date);
+      const looksLikeDate = /(\d{1,2}[\/\-\s]\d{1,2}[\/\-\s]\d{2,4})|(\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{2,4})/i.test(date);
+      return date.length >= 5 && (hasLetters && hasNumbers || looksLikeDate);
     }
 
     function handleStep(msg) {
+      console.log('Current step:', step, 'Message:', msg); // For debugging
+      
       if (step === 1) {
         if (msg === '1') {
           bookingData.payment = 'Cash';
-          addBotMessage('<span style="color:#4caf50;font-weight:bold;">✓</span> Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.<br><br>📱 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
-          step = 2;
+          addBotMessage('<span style="color:#4caf50;font-weight:bold;">✓</span> Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.<br><br>📱 What\'s your phone number? <small>(e.g. 0712345678)</small>');
+          step = 2; // Go to phone step
         } else if (msg === '2') {
           bookingData.payment = 'Installments';
-          addBotMessage('📱 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
-          step = 2;
+          addBotMessage('📱 What\'s your phone number? <small>(e.g. 0712345678)</small>');
+          step = 2; // Go to phone step
         } else {
           addBotMessage('Please reply with <strong>1</strong> for Cash or <strong>2</strong> for Installments.');
         }
@@ -122,10 +127,10 @@
         }
         bookingData.phone = msg;
         addBotMessage('📅 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
-        step = 3;
+        step = 3; // Go to date step
       } else if (step === 3) {
         if (!isValidDate(msg)) {
-          addBotMessage('Please enter a valid date like <strong>15 July 2025</strong>.<br><br>Don\'t just type numbers.');
+          addBotMessage('Please enter a valid date like <strong>15 July 2025</strong> or <strong>23/12/2025</strong>.<br><br>Don\'t just type letters like "gdd".');
           return;
         }
         bookingData.date = msg;
@@ -162,4 +167,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
