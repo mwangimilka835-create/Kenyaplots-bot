@@ -3,11 +3,11 @@ function handleStep(msg) {
     if (msg === '1') {
       bookingData.payment = 'Cash';
       addBotMessage('<span style="color:#4caf50;font-weight:bold;">✓</span> Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.<br><br>📱 What\'s your phone number? <small>(e.g. 0712345678)</small>');
-      step = 2;
+      step = 2; // Go to phone step, NOT date step
     } else if (msg === '2') {
       bookingData.payment = 'Installments';
       addBotMessage('📱 What\'s your phone number? <small>(e.g. 0712345678)</small>');
-      step = 2;
+      step = 2; // Go to phone step
     } else {
       addBotMessage('Please reply with <strong>1</strong> for Cash or <strong>2</strong> for Installments.');
     }
@@ -18,7 +18,7 @@ function handleStep(msg) {
     }
     bookingData.phone = msg;
     addBotMessage('📅 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
-    step = 3;
+    step = 3; // Go to date step
   } else if (step === 3) {
     if (!isValidDate(msg)) {
       addBotMessage('Please enter a valid date like <strong>15 July 2025</strong> or <strong>23/12/2025</strong>.<br><br>Don\'t just type letters like "gdd".');
@@ -32,4 +32,4 @@ function handleStep(msg) {
     sendBtn.disabled = true;
     userInput.placeholder = 'Conversation completed';
   }
-        }
+      }
