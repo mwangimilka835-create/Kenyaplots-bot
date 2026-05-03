@@ -296,11 +296,11 @@
       if (step === 1) {
         if (msg === '1') {
           bookingData.payment = 'Cash';
-          addBotMessage('<span class="checkmark">✓</span> Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.<br><br>📱 What\'s your phone number? <small>(e.g. 0712345678)</small>');
+          addBotMessage('<span class="checkmark">✓</span> Great choice! Cash buyers get a <strong>5% discount</strong> on the listed price.<br><br>📱 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
           step = 2;
         } else if (msg === '2') {
           bookingData.payment = 'Installments';
-          addBotMessage('📱 What\'s your phone number? <small>(e.g. 0712345678)</small>');
+          addBotMessage('📱 When would you like to visit the site?<br><br>Please reply with your preferred date (e.g. 15 July 2025)');
           step = 2;
         } else {
           addBotMessage('Please reply with <strong>1</strong> for Cash or <strong>2</strong> for Installments.');
