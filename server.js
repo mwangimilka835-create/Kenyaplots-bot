@@ -1,11 +1,16 @@
 const admin = require('firebase-admin');
 
 try {
-  // 1. Get the string from Render
-  let serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  const serviceAccountRaw = process.env.FIREBASE_SERVICE_ACCOUNT;
 
-  // 2. Fix the private key formatting (Crucial Step!)
-  // This ensures the \n characters are treated as real new lines
+  if (!serviceAccountRaw) {
+    throw new Error("The environment variable FIREBASE_SERVICE_ACCOUNT is missing on Render!");
+  }
+
+  // Parse the JSON string
+  let serviceAccount = JSON.parse(serviceAccountRaw);
+
+  // Fix the private key formatting
   serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
 
   admin.initializeApp({
@@ -14,5 +19,7 @@ try {
 
   console.log("✅ Firebase connected successfully!");
 } catch (error) {
+  // This will now print a much more helpful error in your Render logs
   console.error("❌ Firebase Error:", error.message);
+  process.exit(1); // Stop the server if Firebase fails
 }
