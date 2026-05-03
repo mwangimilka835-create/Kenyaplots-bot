@@ -1,17 +1,33 @@
+
 const admin = require('firebase-admin');
 
 try {
-  // New method: use 3 separate env vars instead of 1 JSON
+  const serviceAccountRaw = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+  if (!serviceAccountRaw) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT is missing in Render Environment!");
+  }
+
+  let serviceAccount = JSON.parse(serviceAccountRaw);
+
+  /** 
+   * THE FIX: 
+   * We replace double-escaped backslashes and ensure 
+   * the key has the exact format Firebase expects.
+   */
+  serviceAccount.private_key = serviceAccount.private_key
+    .replace(/\\n/g, '\n')     // Fixes escaped newlines
+    .replace(/"/g, '')         // Removes accidental extra quotes
+    .trim();                   // Removes accidental spaces
+
   admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-    })
+    credential: admin.credential.cert(serviceAccount)
   });
 
-  console.log("✅ Firebase connected successfully!");
+  console.log("✅ Firebase Admin initialized successfully!");
 } catch (error) {
   console.error("❌ Firebase Error:", error.message);
-  process.exit(1);
+  // Don't crash the whole server yet so you can debug other parts
 }
+
+const db = admin.firestore();
