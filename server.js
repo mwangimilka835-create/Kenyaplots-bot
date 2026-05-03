@@ -1,25 +1,17 @@
 const admin = require('firebase-admin');
 
 try {
-  const serviceAccountRaw = process.env.FIREBASE_SERVICE_ACCOUNT;
-
-  if (!serviceAccountRaw) {
-    throw new Error("The environment variable FIREBASE_SERVICE_ACCOUNT is missing on Render!");
-  }
-
-  // Parse the JSON string
-  let serviceAccount = JSON.parse(serviceAccountRaw);
-
-  // Fix the private key formatting
-  serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-
+  // New method: use 3 separate env vars instead of 1 JSON
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+    })
   });
 
   console.log("✅ Firebase connected successfully!");
 } catch (error) {
-  // This will now print a much more helpful error in your Render logs
   console.error("❌ Firebase Error:", error.message);
-  process.exit(1); // Stop the server if Firebase fails
+  process.exit(1);
 }
